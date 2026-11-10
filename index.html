@@ -83,8 +83,21 @@ font-size:.9rem;transition:.2s
 width:min(290px,75vw);padding:13px;border-radius:17px;
 background:linear-gradient(145deg,#dce8f7,#73849f 50%,#e8eff8);
 color:#101a2c;transform:rotate(4deg);box-shadow:0 30px 80px #0008;
-animation:swing 6s ease-in-out infinite
+animation:swing 6s ease-in-out infinite;
+touch-action:none;
+cursor:grab;
+user-select:none;
+-webkit-user-select:none;
 }
+
+.id-card:active{cursor:grabbing}
+.id-card img{pointer-events:none;-webkit-user-drag:none}
+
+.id-card.dragged{
+animation:none!important;
+transform:translate3d(var(--drag-x,0px),var(--drag-y,0px),0) rotate(4deg)!important;
+}
+
 .id-photo{height:340px;border-radius:10px;background:linear-gradient(145deg,#172e52,#0a1428);overflow:hidden}
 .id-photo img{width:100%;height:100%;object-fit:cover;object-position:center 42%;display:block}
 .id-label{padding:13px 7px 5px;display:flex;justify-content:space-between;align-items:end}
@@ -283,7 +296,7 @@ memiliki cerita dan makna.
 <div class="lanyard"></div>
 <div class="id-card">
 <div class="id-photo">
-<img src="profile.jpg" alt="Foto Ikhsan Afandi">
+<img src="profile.jpg" alt="Foto Ikhsan Afandi" draggable="false">
 </div>
 <div class="id-label">
 <div>
@@ -725,7 +738,46 @@ link.getAttribute('href')==='#'+entry.target.id
 
 sections.forEach(section=>sectionObserver.observe(section));
 
+
+// DRAG ID CARD - TOUCH & MOUSE
+const idCard=document.querySelector('.id-card');
+
+let dragX=0;
+let dragY=0;
+let startX=0;
+let startY=0;
+let dragging=false;
+
+idCard.addEventListener('pointerdown',e=>{
+if(e.button!==undefined && e.button!==0)return;
+
+dragging=true;
+idCard.classList.add('dragged');
+
+startX=e.clientX-dragX;
+startY=e.clientY-dragY;
+
+idCard.setPointerCapture(e.pointerId);
+e.preventDefault();
+});
+
+idCard.addEventListener('pointermove',e=>{
+if(!dragging)return;
+
+dragX=e.clientX-startX;
+dragY=e.clientY-startY;
+
+idCard.style.setProperty('--drag-x',dragX+'px');
+idCard.style.setProperty('--drag-y',dragY+'px');
+});
+
+function stopDragging(){
+dragging=false;
+}
+
+idCard.addEventListener('pointerup',stopDragging);
+idCard.addEventListener('pointercancel',stopDragging);
+
 </script>
 </body>
 </html>
-
